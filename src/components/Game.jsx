@@ -19,7 +19,7 @@ export default function Game({ currentScore, setCurrentScore, topScore, setTopSc
 
         async function fetchData() {
             try {
-                const response = await fetch('https://maplestory.io/api/gms/28/mob?count=34');
+                const response = await fetch('https://maplestory.io/api/gms/30/mob');
                 const data = await response.json();
                 setMobData(data);
             } catch (error) {
@@ -42,7 +42,7 @@ export default function Game({ currentScore, setCurrentScore, topScore, setTopSc
         async function fetchIcons(cards) {
             try {
                 await Promise.all(cards.map(async (card) => {
-                    const response = await fetch(`https://maplestory.io/api/gms/28/mob/${card.id}/icon`);
+                    const response = await fetch(`https://maplestory.io/api/gms/30/mob/${card.id}/icon`);
                     const icon = response.url;
                     card.icon = icon;
                 }));
@@ -57,7 +57,7 @@ export default function Game({ currentScore, setCurrentScore, topScore, setTopSc
 
                 while (newCards.length < 10) {
                     const random = Math.floor(Math.random() * mobData.length);
-                    if (!newCards.find((c) => c.name === mobData[random].name)) {
+                    if (!newCards.find((c) => c.name === mobData[random].name) && mobData[random].name.match(/^[a-zA-Z]+$/)) {
                         newCards.push({ name: mobData[random].name, id: mobData[random].id });
                     }
                 }
@@ -80,6 +80,10 @@ export default function Game({ currentScore, setCurrentScore, topScore, setTopSc
     if (loading) {
         return 'Loading...';
     } else {
-        return cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon}></Card> });
+        return (
+            <div className='card-container'>
+                {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon}></Card> })}
+            </div>
+        );
     }
 }
