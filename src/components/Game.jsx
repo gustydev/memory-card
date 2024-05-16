@@ -1,75 +1,85 @@
 import { useState, useEffect } from 'react';
 
-function Card({ cardUrl, cardTitle }) {
+function Card({ cardIcon, cardName }) {
     return (
         <div className='card'>
-            <img className='card-image' src={cardUrl} alt={cardTitle}></img>
-            <div className="card-title">{cardTitle}</div>
+            <img className='card-image' src={cardIcon} alt={cardName}></img>
+            <div className="card-title">{cardName}</div>
         </div>
     )
 }
 
-export default function Game( {currentScore, setCurrentScore, topScore, setTopScore} ) {
+export default function Game({ currentScore, setCurrentScore, topScore, setTopScore }) {
     const [cards, setCards] = useState([]);
-    const [mobData, setData] = useState(null);
+    const [mobData, setMobData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let ignore = false;
 
         async function fetchData() {
-            const response = await fetch('https://maplestory.io/api/gms/28/mob?count=34');
-            const data = await response.json();
-            if (!ignore) {
-                setData(data);
+            try {
+                const response = await fetch('https://maplestory.io/api/gms/28/mob?count=34');
+                const data = await response.json();
+                setMobData(data);
+            } catch (error) {
+                console.error('Error fetching mob data:', error);
             }
         }
-        fetchData();
+
+        if (!ignore) {
+            fetchData();
+        }
 
         return () => {
             ignore = true;
-        }
-    }, [])
-
-    useEffect(() => {
-        let newCards = [];
-        if (mobData) {
-            while (newCards.length < 10) {
-                const random = Math.floor(Math.random() * mobData.length);
-                if (!newCards.find((c) => c.name === mobData[random].name)) {
-                    newCards.push({name: mobData[random].name, id: mobData[random].id})
-                }
-            }
-            setCards(newCards);
-        }
-    }, [mobData])
+        };
+    }, []);
 
     useEffect(() => {
         let ignore = false;
 
-        async function fetchIcon(id) {
-            const response = await fetch(`https://maplestory.io/api/gms/28/mob/${id}/icon`);
-            const icon = response.url;
-            return icon;
+        async function fetchIcons(cards) {
+            try {
+                await Promise.all(cards.map(async (card) => {
+                    const response = await fetch(`https://maplestory.io/api/gms/28/mob/${card.id}/icon`);
+                    const icon = response.url;
+                    card.icon = icon;
+                }));
+            } catch (error) {
+                console.error('Error fetching icons:', error);
+            }
         }
 
-        const newCards = cards;
+        async function initializeCards() {
+            if (mobData && cards.length === 0) {
+                let newCards = [];
 
-        if (newCards.length === 10) {
-            newCards.forEach(async (card) => {
-                const icon = await fetchIcon(card.id);
-                card.icon = icon;
-            })
+                while (newCards.length < 10) {
+                    const random = Math.floor(Math.random() * mobData.length);
+                    if (!newCards.find((c) => c.name === mobData[random].name)) {
+                        newCards.push({ name: mobData[random].name, id: mobData[random].id });
+                    }
+                }
+
+                await fetchIcons(newCards);
+                setCards(newCards);
+                setLoading(false);
+            }
         }
+
         if (!ignore) {
-            setCards(newCards);
+            initializeCards();
         }
 
         return () => {
             ignore = true;
-        }
-    }, [cards])
+        };
+    }, [mobData, cards]);
 
-    return (
-        cards ? <div>yay</div> : 'error fetching api'
-    )
+    if (loading) {
+        return 'Loading...';
+    } else {
+        return cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon}></Card> });
+    }
 }
