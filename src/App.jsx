@@ -1,24 +1,18 @@
+import { useState } from 'react';
 import './styles/App.css';
-
-const response = await fetch('https://maplestory.io/api/gms/28/mob?count=32');
-const mobs = await response.json();
-
-const imgUrls = [];
-
-mobs.forEach(async (m) => {
-  const mobId = m.id;
-  const resp = await fetch(`https://maplestory.io/api/gms/28/mob/${mobId}/icon`);
-  const img = resp.url;
-  imgUrls.push(img);
-})
-
-console.log(imgUrls)
+import Game from './components/Game';
 
 function App() {
+  const [currentScore, setCurrentScore] = useState(0);
+  const [topScore, setTopScore] = useState(0);
+
   return (
     <>
-    <h1>Memory Cards</h1>
+    <h1>Monster Cards</h1>
     <p>Click the cards to raise your score, but don't click the same card twice!</p>
+    <p>Current score: {currentScore}</p>
+    <p>Top score: {topScore}</p>
+    {<Game currentScore={currentScore} topScore={topScore} setCurrentScore={setCurrentScore} setTopScore={setTopScore}></Game>}
     </>
   )
 }

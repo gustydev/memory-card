@@ -1,0 +1,31 @@
+@font-face {
+    font-family: maplefont;
+    src: url('../assets/Maplestory OTF Light/Maplestory OTF Light.otf');
+}
+
+body {
+    font-family: maplefont, Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    display: grid;
+    grid-template-rows: 3fr 1fr;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid gray;
+    padding: 16px;
+}
+
+.card-title {
+    text-align: center;
+}
+
+.card-image {
+    justify-self: center;
+}
