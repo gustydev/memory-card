@@ -5,6 +5,7 @@
 
 #root {
     font-family: maplefont, Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 125%;
 }
 
 .card-container {
@@ -15,7 +16,7 @@
 
 .card {
     display: grid;
-    grid-template-rows: 4fr 2fr;
+    grid-template-rows: 3fr 1fr;
     align-items: center;
     justify-content: center;
     border: 1px solid gray;
@@ -27,8 +28,17 @@
     cursor: pointer;
 }
 
+.card:hover {
+    background-color: rgb(211, 211, 211);
+}
+
+.card-title, .card-image {
+    pointer-events: none;
+}
+
 .card-title {
     text-align: center;
+    align-self: end;
 }
 
 .card-image {

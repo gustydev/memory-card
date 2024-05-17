@@ -1,18 +1,75 @@
 import { useState, useEffect } from 'react';
 
-function Card({ cardIcon, cardName, onClick }) {
+function Card({ cardIcon, cardName, cardId, clickFun }) {
     return (
-        <button className='card'>
+        <button className='card' id={cardId} onClick={(e) => clickFun(e)}>
             <img className='card-image' src={cardIcon} alt={cardName}></img>
             <div className="card-title">{cardName}</div>
         </button>
     )
 }
 
-export default function Interface({ currentScore, setCurrentScore, topScore, setTopScore }) {
+export default function Interface() {
     const [cards, setCards] = useState([]);
     const [mobData, setMobData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [currentScore, setCurrentScore] = useState(0);
+    const [topScore, setTopScore] = useState(0);
+
+    function shuffleCards(cards) {
+        const newCards = cards;
+
+        let currentIndex = newCards.length;
+        
+        while (currentIndex !== 0) {
+            let randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            [newCards[currentIndex], newCards[randomIndex]] = [newCards[randomIndex], newCards[currentIndex]];
+        }
+
+        setCards(newCards);
+    }
+
+    function resetCardClicks(cards) {
+        const newCards = cards;
+
+        newCards.forEach((card) => {
+            card.clicked = false;
+        })
+
+        setCards(newCards);
+    } 
+
+    function setScores(e) {
+        const newCards = cards;
+        const card = newCards.find(c => c.id === Number(e.target.id));
+        let newScore = currentScore;
+        let newTopScore = topScore;
+
+        if (card.clicked) {
+            newScore = 0;
+            resetCardClicks(cards);
+        } else if (!card.clicked) {
+            newScore += 1;
+            card.clicked = true;
+            setCards(newCards);
+        }
+
+        if (newScore >= topScore) {
+            newTopScore = newScore;
+            setTopScore(newTopScore);
+        }
+
+        setCurrentScore(newScore);
+
+        if (newScore === cards.length) {
+            newScore = 0;
+            resetCardClicks(cards);
+        }
+
+        shuffleCards(cards);
+    }
 
     useEffect(() => {
         let ignore = false;
@@ -55,7 +112,7 @@ export default function Interface({ currentScore, setCurrentScore, topScore, set
             if (mobData && cards.length === 0) {
                 let newCards = [];
 
-                while (newCards.length < 10) {
+                while (newCards.length < 5) {
                     const random = Math.floor(Math.random() * mobData.length);
                     if (!newCards.find((c) => c.name === mobData[random].name) && mobData[random].name.match(/^[a-zA-Z]+$/)) {
                         newCards.push({ name: mobData[random].name, id: mobData[random].id, clicked: false });
@@ -77,8 +134,6 @@ export default function Interface({ currentScore, setCurrentScore, topScore, set
         };
     }, [mobData, cards]);
 
-    console.log(cards)
-
     if (loading) {
         return 'Loading...';
     } else {
@@ -90,7 +145,7 @@ export default function Interface({ currentScore, setCurrentScore, topScore, set
                 <p>Top score: {topScore}</p>
             </div>
             <div className='card-container'>
-                {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon}></Card> })}
+                {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon} cardId={c.id} clickFun={setScores}></Card> })}
             </div>
         </>
         );
