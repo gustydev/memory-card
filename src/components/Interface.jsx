@@ -136,8 +136,7 @@ export default function Interface() {
         <>
             <div className="game-info">
                 <p>Click the cards to raise your score, but don't click the same card twice! The game gets increasingly harder as you go on.</p>
-                <p>Current score: {currentScore}</p>
-                <p>Top score: {topScore}</p>
+                <p className='scores'>Current score: {currentScore} | Top score: {topScore}</p>
             </div>
             <div className='card-container'>
                 {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon} cardId={c.id} clickFun={setScores}></Card> })}
