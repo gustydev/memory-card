@@ -21,10 +21,10 @@
     justify-content: center;
     border: 1px solid gray;
     padding: 16px;
-    height: 250px;
+    min-height: 250px;
     background-color: white;
     font-family: maplefont;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
 }
 
@@ -44,4 +44,5 @@
 .card-image {
     justify-self: center;
     align-self: center;
+    max-width: 200px;
 }

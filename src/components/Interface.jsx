@@ -15,8 +15,9 @@ export default function Interface() {
     const [loading, setLoading] = useState(true);
     const [currentScore, setCurrentScore] = useState(0);
     const [topScore, setTopScore] = useState(0);
+    const [cardNumber, setCardNumber] = useState(3);
 
-    function shuffleCards(cards) {
+    function shuffleCards() {
         const newCards = cards;
 
         let currentIndex = newCards.length;
@@ -31,7 +32,7 @@ export default function Interface() {
         setCards(newCards);
     }
 
-    function resetCardClicks(cards) {
+    function resetCardClicks() {
         const newCards = cards;
 
         newCards.forEach((card) => {
@@ -49,26 +50,27 @@ export default function Interface() {
 
         if (card.clicked) {
             newScore = 0;
-            resetCardClicks(cards);
+            resetCardClicks();
+            setCardNumber(3);
         } else if (!card.clicked) {
             newScore += 1;
             card.clicked = true;
-            setCards(newCards);
+            if (!newCards.find(c => !c.clicked)) {
+                setCards([]);
+                setCardNumber(n => n + 1);
+            } else {
+                setCards(newCards);
+            }
         }
+
+        setCurrentScore(newScore);
 
         if (newScore >= topScore) {
             newTopScore = newScore;
             setTopScore(newTopScore);
         }
 
-        setCurrentScore(newScore);
-
-        if (newScore === cards.length) {
-            newScore = 0;
-            resetCardClicks(cards);
-        }
-
-        shuffleCards(cards);
+        shuffleCards();
     }
 
     useEffect(() => {
@@ -76,7 +78,7 @@ export default function Interface() {
 
         async function fetchData() {
             try {
-                const response = await fetch('https://maplestory.io/api/gms/30/mob');
+                const response = await fetch('https://maplestory.io/api/gms/28/mob?count=294');
                 const data = await response.json();
                 setMobData(data);
             } catch (error) {
@@ -94,12 +96,10 @@ export default function Interface() {
     }, []);
 
     useEffect(() => {
-        let ignore = false;
-
         async function fetchIcons(cards) {
             try {
                 await Promise.all(cards.map(async (card) => {
-                    const response = await fetch(`https://maplestory.io/api/gms/30/mob/${card.id}/icon`);
+                    const response = await fetch(`https://maplestory.io/api/gms/28/mob/${card.id}/icon`);
                     const icon = response.url;
                     card.icon = icon;
                 }));
@@ -109,10 +109,10 @@ export default function Interface() {
         }
 
         async function initializeCards() {
-            if (mobData && cards.length === 0) {
+            if (mobData && (cards.length === 0 || cards.length !== cardNumber)) {
                 let newCards = [];
 
-                while (newCards.length < 5) {
+                while (newCards.length < cardNumber) {
                     const random = Math.floor(Math.random() * mobData.length);
                     if (!newCards.find((c) => c.name === mobData[random].name) && mobData[random].name.match(/^[a-zA-Z]+$/)) {
                         newCards.push({ name: mobData[random].name, id: mobData[random].id, clicked: false });
@@ -125,14 +125,9 @@ export default function Interface() {
             }
         }
 
-        if (!ignore) {
-            initializeCards();
-        }
+        initializeCards();
 
-        return () => {
-            ignore = true;
-        };
-    }, [mobData, cards]);
+    }, [mobData, cards, cardNumber]);
 
     if (loading) {
         return 'Loading...';
@@ -140,7 +135,7 @@ export default function Interface() {
         return (
         <>
             <div className="game-info">
-                <p>Click the cards to raise your score, but don't click the same card twice!</p>
+                <p>Click the cards to raise your score, but don't click the same card twice! The game gets increasingly harder as you go on.</p>
                 <p>Current score: {currentScore}</p>
                 <p>Top score: {topScore}</p>
             </div>
