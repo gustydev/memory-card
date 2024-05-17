@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 
-function Card({ cardIcon, cardName }) {
+function Card({ cardIcon, cardName, onClick }) {
     return (
-        <div className='card'>
+        <button className='card'>
             <img className='card-image' src={cardIcon} alt={cardName}></img>
             <div className="card-title">{cardName}</div>
-        </div>
+        </button>
     )
 }
 
-export default function Game({ currentScore, setCurrentScore, topScore, setTopScore }) {
+export default function Interface({ currentScore, setCurrentScore, topScore, setTopScore }) {
     const [cards, setCards] = useState([]);
     const [mobData, setMobData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -58,7 +58,7 @@ export default function Game({ currentScore, setCurrentScore, topScore, setTopSc
                 while (newCards.length < 10) {
                     const random = Math.floor(Math.random() * mobData.length);
                     if (!newCards.find((c) => c.name === mobData[random].name) && mobData[random].name.match(/^[a-zA-Z]+$/)) {
-                        newCards.push({ name: mobData[random].name, id: mobData[random].id });
+                        newCards.push({ name: mobData[random].name, id: mobData[random].id, clicked: false });
                     }
                 }
 
@@ -77,13 +77,22 @@ export default function Game({ currentScore, setCurrentScore, topScore, setTopSc
         };
     }, [mobData, cards]);
 
+    console.log(cards)
+
     if (loading) {
         return 'Loading...';
     } else {
         return (
+        <>
+            <div className="game-info">
+                <p>Click the cards to raise your score, but don't click the same card twice!</p>
+                <p>Current score: {currentScore}</p>
+                <p>Top score: {topScore}</p>
+            </div>
             <div className='card-container'>
                 {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon}></Card> })}
             </div>
+        </>
         );
     }
 }

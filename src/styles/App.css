@@ -3,7 +3,7 @@
     src: url('../assets/Maplestory OTF Light/Maplestory OTF Light.otf');
 }
 
-body {
+#root {
     font-family: maplefont, Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
@@ -15,11 +15,16 @@ body {
 
 .card {
     display: grid;
-    grid-template-rows: 3fr 1fr;
+    grid-template-rows: 4fr 2fr;
     align-items: center;
     justify-content: center;
     border: 1px solid gray;
     padding: 16px;
+    height: 250px;
+    background-color: white;
+    font-family: maplefont;
+    font-size: 20px;
+    cursor: pointer;
 }
 
 .card-title {
@@ -28,4 +33,5 @@ body {
 
 .card-image {
     justify-self: center;
+    align-self: center;
 }
