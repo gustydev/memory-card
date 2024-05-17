@@ -78,7 +78,7 @@ export default function Interface() {
 
         async function fetchData() {
             try {
-                const response = await fetch('https://maplestory.io/api/gms/28/mob?count=294');
+                const response = await fetch('https://maplestory.io/api/gms/28/mob');
                 const data = await response.json();
                 setMobData(data);
             } catch (error) {
@@ -100,8 +100,11 @@ export default function Interface() {
             try {
                 await Promise.all(cards.map(async (card) => {
                     const response = await fetch(`https://maplestory.io/api/gms/28/mob/${card.id}/icon`);
-                    const icon = response.url;
-                    card.icon = icon;
+                    if (response.ok) {
+                        card.icon = response.url;
+                    } else {
+                        card.icon = 'https://maplestory.io/api/gms/250/item/3800088/icon' // Placeholder if icon cannot be fetched
+                    }
                 }));
             } catch (error) {
                 console.error('Error fetching icons:', error);
@@ -113,9 +116,9 @@ export default function Interface() {
                 let newCards = [];
 
                 while (newCards.length < cardNumber) {
-                    const random = Math.floor(Math.random() * mobData.length);
-                    if (!newCards.find((c) => c.name === mobData[random].name) && mobData[random].name.match(/^[a-zA-Z]+$/)) {
-                        newCards.push({ name: mobData[random].name, id: mobData[random].id, clicked: false });
+                    const randomMob = mobData[Math.floor(Math.random() * mobData.length)];
+                    if (!newCards.find((c) => c.name === randomMob.name) && randomMob.name.match(/^[a-zA-Z]+$/)) {
+                        newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false });
                     }
                 }
 
