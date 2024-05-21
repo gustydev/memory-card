@@ -15,7 +15,7 @@ export default function Game() {
     const [loading, setLoading] = useState(true);
     const [currentScore, setCurrentScore] = useState(0);
     const [topScore, setTopScore] = useState(0);
-    const [cardNumber, setCardNumber] = useState(32);
+    const [cardNumber, setCardNumber] = useState(3);
 
     function shuffleCards() {
         const newCards = cards;
