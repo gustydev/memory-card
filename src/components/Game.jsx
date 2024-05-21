@@ -15,7 +15,7 @@ export default function Game() {
     const [loading, setLoading] = useState(true);
     const [currentScore, setCurrentScore] = useState(0);
     const [topScore, setTopScore] = useState(0);
-    const [cardNumber, setCardNumber] = useState(3);
+    const [cardNumber, setCardNumber] = useState(32);
 
     function shuffleCards() {
         const newCards = cards;
@@ -118,7 +118,7 @@ export default function Game() {
 
                 while (newCards.length < cardNumber) {
                     const randomMob = mobData[Math.floor(Math.random() * mobData.length)];
-                    if (!newCards.find((c) => c.name === randomMob.name) && randomMob.name.match(/^[A-Za-z\s]+$/)) {
+                    if (!newCards.find((c) => c.name === randomMob.name) && randomMob.name.match(/^[A-Za-z]+$/)) {
                         newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false });
                     }
                 }
