@@ -100,7 +100,7 @@ export default function Game() {
         async function fetchIcons(cards) {
             try {
                 await Promise.all(cards.map(async (card) => {
-                    const response = await fetch(`https://maplestory.io/api/gms/28/mob/${card.id}/icon`);
+                    const response = await fetch(`https://maplestory.io/api/gms/250/mob/${card.id}/icon`);
                     if (response.ok) {
                         card.icon = response.url;
                     } else {
@@ -118,7 +118,7 @@ export default function Game() {
 
                 while (newCards.length < cardNumber) {
                     const randomMob = mobData[Math.floor(Math.random() * mobData.length)];
-                    if (!newCards.find((c) => c.name === randomMob.name) && randomMob.name.match(/^[a-zA-Z]+$/)) {
+                    if (!newCards.find((c) => c.name === randomMob.name) && randomMob.name.match(/^[A-Za-z\s]+$/)) {
                         newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false });
                     }
                 }
