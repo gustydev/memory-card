@@ -9,7 +9,7 @@ function Card({ cardIcon, cardName, cardId, clickFun }) {
     )
 }
 
-export default function Interface() {
+export default function Game() {
     const [cards, setCards] = useState([]);
     const [mobData, setMobData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ export default function Interface() {
         setCards(newCards);
     } 
 
-    function setScores(e) {
+    function handleScores(e) {
         const newCards = cards;
         const card = newCards.find(c => c.id === Number(e.target.id));
         let newScore = currentScore;
@@ -96,6 +96,7 @@ export default function Interface() {
     }, []);
 
     useEffect(() => {
+        let ignore = false;
         async function fetchIcons(cards) {
             try {
                 await Promise.all(cards.map(async (card) => {
@@ -127,9 +128,13 @@ export default function Interface() {
                 setLoading(false);
             }
         }
+        if (!ignore) {
+            initializeCards();
+        }
 
-        initializeCards();
-
+        return () => {
+            ignore = true;
+        }
     }, [mobData, cards, cardNumber]);
 
     if (loading) {
@@ -142,7 +147,7 @@ export default function Interface() {
                 <p className='scores'>Current score: {currentScore} | Top score: {topScore}</p>
             </div>
             <div className='card-container'>
-                {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon} cardId={c.id} clickFun={setScores}></Card> })}
+                {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon} cardId={c.id} clickFun={handleScores}></Card> })}
             </div>
         </>
         );

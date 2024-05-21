@@ -1,12 +1,11 @@
-import { useState } from 'react';
 import './styles/App.css';
-import Interface from './components/Interface';
+import Game from './components/Game';
 
 function App() {
   return (
     <>
       <h1 className='title'>Monster Cards</h1>
-      {<Interface></Interface>}
+      {<Game></Game>}
     </>
   )
 }
