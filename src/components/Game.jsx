@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 function Card({ cardIcon, cardName, cardId, clickFun }) {
     return (
@@ -8,6 +9,13 @@ function Card({ cardIcon, cardName, cardId, clickFun }) {
         </button>
     )
 }
+
+Card.propTypes = {
+    cardIcon: PropTypes.string,
+    cardName: PropTypes.string,
+    cardId: PropTypes.number,
+    clickFun: PropTypes.func
+};
 
 export default function Game() {
     const [cards, setCards] = useState([]);
@@ -78,7 +86,7 @@ export default function Game() {
 
         async function fetchData() {
             try {
-                const response = await fetch('https://maplestory.io/api/gms/28/mob');
+                const response = await fetch('https://maplestory.io/api/gms/250/mob?count=2000');
                 const data = await response.json();
                 setMobData(data);
             } catch (error) {
@@ -97,18 +105,28 @@ export default function Game() {
 
     useEffect(() => {
         let ignore = false;
-        async function fetchIcons(cards) {
+
+        async function fetchIcon(mobId) {
             try {
-                await Promise.all(cards.map(async (card) => {
-                    const response = await fetch(`https://maplestory.io/api/gms/250/mob/${card.id}/icon`);
-                    if (response.ok) {
-                        card.icon = response.url;
-                    } else {
-                        card.icon = 'https://maplestory.io/api/gms/250/item/3800088/icon' // Placeholder if icon cannot be fetched
+                const response = await fetch(`https://maplestory.io/api/gms/250/mob/${mobId}/icon`);
+                if (!response.ok) {
+                    return null;
+                }
+
+                const url = response.url;
+
+                const img = new Image();
+                img.src = url;
+
+                return await img.decode().then(() => {
+                    if (img.width < 5) {
+                        return null;
                     }
-                }));
+                    return url;
+                });
+
             } catch (error) {
-                console.error('Error fetching icons:', error);
+                console.error('Error fetching icon: ', error)
             }
         }
 
@@ -118,12 +136,12 @@ export default function Game() {
 
                 while (newCards.length < cardNumber) {
                     const randomMob = mobData[Math.floor(Math.random() * mobData.length)];
-                    if (!newCards.find((c) => c.name === randomMob.name) && randomMob.name.match(/^[A-Za-z]+$/)) {
-                        newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false });
+                    const iconUrl = await fetchIcon(randomMob.id);
+                    if (!newCards.find((c) => c.name === randomMob.name) && iconUrl) {
+                        newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false, icon: iconUrl });
                     }
                 }
 
-                await fetchIcons(newCards);
                 setCards(newCards);
                 setLoading(false);
             }
