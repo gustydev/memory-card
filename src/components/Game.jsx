@@ -48,7 +48,7 @@ export default function Game() {
         })
 
         setCards(newCards);
-    } 
+    }
 
     function handleScores(e) {
         const newCards = cards;
@@ -58,6 +58,10 @@ export default function Game() {
 
         if (card.clicked) {
             newScore = 0;
+            if (cardNumber > 2) {
+                setLoading(true)
+            }
+            setCards([])
             resetCardClicks();
             setCardNumber(2);
         } else if (!card.clicked) {
