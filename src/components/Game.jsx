@@ -23,7 +23,7 @@ export default function Game() {
     const [loading, setLoading] = useState(true);
     const [currentScore, setCurrentScore] = useState(0);
     const [topScore, setTopScore] = useState(0);
-    const [cardNumber, setCardNumber] = useState(3);
+    const [cardNumber, setCardNumber] = useState(2);
 
     function shuffleCards() {
         const newCards = cards;
@@ -59,11 +59,12 @@ export default function Game() {
         if (card.clicked) {
             newScore = 0;
             resetCardClicks();
-            setCardNumber(3);
+            setCardNumber(2);
         } else if (!card.clicked) {
             newScore += 1;
             card.clicked = true;
             if (!newCards.find(c => !c.clicked)) {
+                setLoading(true);
                 setCards([]);
                 setCardNumber(n => n + 1);
             } else {
@@ -136,9 +137,11 @@ export default function Game() {
 
                 while (newCards.length < cardNumber) {
                     const randomMob = mobData[Math.floor(Math.random() * mobData.length)];
-                    const iconUrl = await fetchIcon(randomMob.id);
-                    if (!newCards.find((c) => c.name === randomMob.name) && iconUrl) {
-                        newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false, icon: iconUrl });
+                    if (!newCards.find((c) => c.name === randomMob.name)) {
+                        const iconUrl = await fetchIcon(randomMob.id);
+                        if (iconUrl) {
+                            newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false, icon: iconUrl });
+                        }
                     }
                 }
 
@@ -155,19 +158,17 @@ export default function Game() {
         }
     }, [mobData, cards, cardNumber]);
 
-    if (loading) {
-        return 'Loading...';
-    } else {
-        return (
-        <>
-            <div className="game-info">
-                <p>Click the cards to raise your score, but don't click the same card twice! The game gets increasingly harder as you go on.</p>
-                <p className='scores'>Current score: {currentScore} | Top score: {topScore}</p>
-            </div>
+    return (
+    <>
+        <div className="game-info">
+            <p>Click the cards to raise your score, but don&apos;t click the same card twice! The game gets increasingly harder as you go on.</p>
+            <p className='scores'>Current score: {currentScore} | Top score: {topScore}</p>
+        </div>
+        {loading ? 'Loading...' : (
             <div className='card-container'>
                 {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon} cardId={c.id} clickFun={handleScores}></Card> })}
             </div>
-        </>
-        );
-    }
+        )}
+    </>
+    )
 }
