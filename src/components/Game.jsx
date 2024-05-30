@@ -86,7 +86,7 @@ export default function Game() {
 
         async function fetchData() {
             try {
-                const response = await fetch('https://maplestory.io/api/gms/250/mob?count=2000');
+                const response = await fetch('https://maplestory.io/api/gms/250/mob?count=1000');
                 const data = await response.json();
                 setMobData(data);
             } catch (error) {
