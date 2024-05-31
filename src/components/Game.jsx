@@ -91,7 +91,7 @@ export default function Game() {
 
         async function fetchData() {
             try {
-                const response = await fetch('https://maplestory.io/api/gms/250/mob?count=1000');
+                const response = await fetch('https://maplestory.io/api/gms/250/mob');
                 const data = await response.json();
                 setMobData(data);
             } catch (error) {
@@ -135,22 +135,40 @@ export default function Game() {
             }
         }
 
+        async function createCards(cards) {
+            let newCards = cards;
+            while (newCards.length < cardNumber) {
+                const randomMob = mobData[Math.floor(Math.random() * mobData.length)];
+                if (!newCards.find((c) => c.name === randomMob.name)) {
+                    newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false, icon: undefined });
+                }
+            }
+
+            await Promise.all(newCards.map(async (card) => {
+                if (!card.icon) {
+                    const icon = await fetchIcon(card.id);
+                    if (!icon) {
+                        newCards = newCards.filter(c => c !== card);
+                        return;
+                    }
+                    card.icon = icon;
+                } else {
+                    return;
+                }
+            }));
+
+            if (newCards.length < cardNumber) {
+                return createCards(newCards);
+            } else {
+                setLoading(false);
+                return newCards;
+            }
+        }
+
         async function initializeCards() {
             if (mobData && (cards.length === 0 || cards.length !== cardNumber)) {
-                let newCards = [];
-
-                while (newCards.length < cardNumber) {
-                    const randomMob = mobData[Math.floor(Math.random() * mobData.length)];
-                    if (!newCards.find((c) => c.name === randomMob.name)) {
-                        const iconUrl = await fetchIcon(randomMob.id);
-                        if (iconUrl) {
-                            newCards.push({ name: randomMob.name, id: randomMob.id, clicked: false, icon: iconUrl });
-                        }
-                    }
-                }
-
+                const newCards = await createCards([]);
                 setCards(newCards);
-                setLoading(false);
             }
         }
         if (!ignore) {
