@@ -50,7 +50,7 @@ export default function Game() {
         setCards(newCards);
     }
 
-    function handleScores(e) {
+    function handleGame(e) {
         const newCards = cards;
         const card = newCards.find(c => c.id === Number(e.target.id));
         let newScore = currentScore;
@@ -93,9 +93,12 @@ export default function Game() {
             try {
                 const response = await fetch('https://maplestory.io/api/gms/250/mob');
                 const data = await response.json();
+                if (!response.ok) {
+                    throw new Error('Error fetching mob data (status ', response.status, ')')
+                }
                 setMobData(data);
             } catch (error) {
-                console.error('Error fetching mob data:', error);
+                console.error(error);
             }
         }
 
@@ -115,7 +118,7 @@ export default function Game() {
             try {
                 const response = await fetch(`https://maplestory.io/api/gms/250/mob/${mobId}/icon`);
                 if (!response.ok) {
-                    return null;
+                    throw new Error(`Could not fetch icon for mob ID ${mobId} (status ${response.status})`)
                 }
 
                 const url = response.url;
@@ -131,7 +134,7 @@ export default function Game() {
                 });
 
             } catch (error) {
-                console.error('Error fetching icon: ', error)
+                console.error(error)
             }
         }
 
@@ -188,7 +191,7 @@ export default function Game() {
         </div>
         {loading ? 'Loading...' : (
             <div className='card-container'>
-                {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon} cardId={c.id} clickFun={handleScores}></Card> })}
+                {cards.map((c) => { return <Card key={c.id} cardName={c.name} cardIcon={c.icon} cardId={c.id} clickFun={handleGame}></Card> })}
             </div>
         )}
     </>
