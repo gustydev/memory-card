@@ -24,6 +24,29 @@ export default function Game() {
     const [currentScore, setCurrentScore] = useState(0);
     const [topScore, setTopScore] = useState(0);
     const [cardNumber, setCardNumber] = useState(2);
+    const [version, setVersion] = useState('252');
+
+    async function versionSwitch() {
+        const ver = prompt('Type a valid game version for the monster data (list available at https://maplestory.wiki/GMS):')
+        if (!ver) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://maplestory.io/api/gms/${ver}/mob?count=1`);
+            if (!response.ok) {
+                alert('Invalid game version')
+                throw new Error('Invalid game version')
+            } else {
+                setVersion(ver);
+                setCurrentScore(0);
+                setCards([]);
+                setCardNumber(2);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     function shuffleCards() {
         const newCards = cards;
@@ -91,7 +114,7 @@ export default function Game() {
 
         async function fetchData() {
             try {
-                const response = await fetch('https://maplestory.io/api/gms/250/mob');
+                const response = await fetch(`https://maplestory.io/api/gms/${version}/mob`);
                 const data = await response.json();
                 if (!response.ok) {
                     throw new Error('Error fetching mob data (status ', response.status, ')')
@@ -109,14 +132,14 @@ export default function Game() {
         return () => {
             ignore = true;
         };
-    }, []);
+    }, [version]);
 
     useEffect(() => {
         let ignore = false;
 
         async function fetchIcon(mobId) {
             try {
-                const response = await fetch(`https://maplestory.io/api/gms/250/mob/${mobId}/icon`);
+                const response = await fetch(`https://maplestory.io/api/gms/${version}/mob/${mobId}/icon`);
                 if (!response.ok) {
                     throw new Error(`Could not fetch icon for mob ID ${mobId} (status ${response.status})`)
                 }
@@ -181,10 +204,14 @@ export default function Game() {
         return () => {
             ignore = true;
         }
-    }, [mobData, cards, cardNumber]);
+    }, [mobData, cards, cardNumber, version]);
 
     return (
     <>
+        <div className="version-manage">
+            <div>v{version}</div>
+            <button onClick={() => versionSwitch()}>Switch version</button>
+        </div>
         <div className="game-info">
             <p>Click the cards to raise your score, but don&apos;t click the same card twice! The game gets increasingly harder as you go on.</p>
             <p className='scores'>Current score: {currentScore} | Top score: {topScore}</p>
