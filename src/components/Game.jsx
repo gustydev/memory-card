@@ -139,7 +139,7 @@ export default function Game() {
 
         async function fetchIcon(mobId) {
             try {
-                const response = await fetch(`https://maplestory.io/api/gms/${version}/mob/${mobId}/icon`);
+                const response = await fetch(`https://maplestory.io/api/gms/252/mob/${mobId}/icon`);
                 if (!response.ok) {
                     throw new Error(`Could not fetch icon for mob ID ${mobId} (status ${response.status})`)
                 }
