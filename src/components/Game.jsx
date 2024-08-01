@@ -22,9 +22,9 @@ export default function Game() {
     const [mobData, setMobData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentScore, setCurrentScore] = useState(0);
-    const [topScore, setTopScore] = useState(0);
     const [cardNumber, setCardNumber] = useState(2);
     const [version, setVersion] = useState('252');
+    const topScore = localStorage.getItem('topScore') || 0; // Use topScore from localstorage; set it to zero if first time player
 
     async function versionSwitch() {
         const ver = prompt('Type a valid game version for the monster data (list available at https://maplestory.wiki/GMS):')
@@ -77,7 +77,7 @@ export default function Game() {
         const newCards = cards;
         const card = newCards.find(c => c.id === Number(e.target.id));
         let newScore = currentScore;
-        let newTopScore = topScore;
+        let newTopScore = localStorage.getItem('topScore');
 
         if (card.clicked) {
             newScore = 0;
@@ -103,7 +103,7 @@ export default function Game() {
 
         if (newScore >= topScore) {
             newTopScore = newScore;
-            setTopScore(newTopScore);
+            localStorage.setItem('topScore', newTopScore);
         }
 
         shuffleCards();
